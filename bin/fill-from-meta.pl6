@@ -11,7 +11,7 @@ my $mod-m = $koos.model('Module');
 
 multi sub MAIN('update') {
   my $local-uri = $*CWD.child("ecosystems").absolute andthen *.IO.mkdir;
-  my $proc = run('ecogen', '--/remote', '--local', qq|--local-uri="$local-uri"|, 'update', 'p6c','cpan');
+  my $proc = run('ecogen', '--/remote', '--local', qq|--local-uri=$local-uri|, 'update', 'p6c','cpan');
   die "Failed to update ecosystem data" unless $proc.so;
   process($local-uri);
 }
