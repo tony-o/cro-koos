@@ -5,3 +5,6 @@ post:
   - Ctrl::Package::&available
 get:
   - Ctrl::Package::&available
+get:
+  - Ctrl::UI::&main
+  - Ctrl::UI::&try-static

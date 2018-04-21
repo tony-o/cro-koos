@@ -1,7 +1,7 @@
 unit module Ctrl::Package;
 use Cro::HTTP::Router;
 
-our sub available('available', :$req = request) {
+our sub available('candidates', :$req = request) {
   CATCH { default { .say ; } }
   my %criteria;
   request-body -> %params {

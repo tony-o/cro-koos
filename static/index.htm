@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>zef</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/custom.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="py-5 text-center">
+        <h2>zef ecosystem</h2>
+        <p class="lead">
+          use zef search for great success (not guaranteed)
+        </p>
+      </div>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">
+            <i class="icon icon-search-circled">&#xe800;</i>
+          </span>
+        </div>
+        <input type="text" class="form-control" placeholder="module:auth<>:api<>:ver<>" id="search-terms" />
+      </div>
+      <br/>
+      <div class="hide-until-search" style="display:none;">
+        <h3>query results for <span id="query"></span> (results: <span id="result_count"></span>)</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>name</th>
+              <th>version</th>
+              <th>auth</th>
+              <th>api</th>
+              <th>source</th>
+            </tr>
+          </thead>
+          <tbody class="table-body">
+            <tr class="table-row-template">
+              <td class="name"></td>
+              <td class="version"></td>
+              <td class="auth"></td>
+              <td class="api"></td>
+              <td class="source"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="/js/search.js"></script>
+  </body>
+</html>
