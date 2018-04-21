@@ -1,3 +1,7 @@
+post:
+  - Ctrl::User::&create
+  - Ctrl::User::&request-token
+  - Ctrl::User::&remove-tokens
+  - Ctrl::Package::&available
 get:
-  - Ctrl::Greet::&greet
-  - Ctrl::Greet::&bye
+  - Ctrl::Package::&available

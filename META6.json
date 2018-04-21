@@ -1,0 +1,15 @@
+{
+  "name"        : "Koos",
+  "version"     : "0.0.1",
+  "perl"        : "6",
+  "description" : "zefpan",
+  "auth"        : "github:tony-o",
+  "authors"     : [ "Tony O'Dell" ],
+  "depends"     : {
+    "Koos": "*",
+    "Cro": "*",
+    "Crypt::Libcrypt": "*"
+  },
+  "provides"    : {},
+  "source-url"  : "git://github.com/tony-o/perl6-koos.git"
+} 
