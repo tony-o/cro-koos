@@ -2,13 +2,21 @@
 use lib 'lib';
 use Koos;
 use JSON::Fast;
+require App::ecogen;
 
 my $koos = Koos.new;
 $koos.connect(driver => 'SQLite', options => { db => { database => 'test.sqlite3', }, }, );
 
 my $mod-m = $koos.model('Module');
 
-sub MAIN(Any:D :$path) {
+multi sub MAIN('update') {
+  my $local-uri = $*CWD.child("ecosystems").absolute andthen *.IO.mkdir;
+  my $proc = run('ecogen', '--/remote', '--local', qq|--local-uri="$local-uri"|, 'update', 'p6c','cpan');
+  die "Failed to update ecosystem data" unless $proc.so;
+  process($local-uri);
+}
+
+multi sub MAIN(Any:D :$path) {
   die "{$path.IO.absolute} not found"
     unless $path.IO ~~ :e;
 
@@ -16,14 +24,14 @@ sub MAIN(Any:D :$path) {
 
 }
 
-multi sub process(IO $path where { $_ ~~ :d }) {
+multi sub process(IO() $path where { $_ ~~ :d }) {
   for $path.dir -> $x {
     next if $x ~~ :f && $x.basename ne 'META6.json';
     process $x;
   }
 }
 
-multi sub process(IO $path where { $_ ~~ :f }) {
+multi sub process(IO() $path where { $_ ~~ :f }) {
   say "==> Processing {$path.relative}";
   my %data = from-json $path.slurp;
 
