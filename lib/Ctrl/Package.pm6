@@ -36,7 +36,7 @@ sub search-modules(%criteria) {
   @mods.push(|$provides.search({ name => %criteria<name> }).all.grep({
     ((%criteria<auth>.defined && %criteria<auth> eq .module.auth) || !%criteria<auth>.defined)
     &&
-    ((%criteria<api>.defined && %criteria<api> eq .module.api) || !%criteria<api>.defined)
+    ((%criteria<api>.defined && %criteria<api> eqv .module.api) || !%criteria<api>.defined)
   }).map({ .module })) if %criteria<name>;
   @mods;
 }
