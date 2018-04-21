@@ -9,14 +9,14 @@ our sub available('available', :$req = request) {
     %criteria<auth> = %params<auth> if %params<auth>;
     %criteria<api>  = %params<api>  if %params<api>;
     # version/auth/api
-    %criteria<vers> = Version.new(%params<vers>)
-      if %params<vers>;
+    %criteria<version> = Version.new(%params<version>)
+      if %params<version>;
   } if $req.method eq 'POST';
-  my @mods = search-modules(%criteria.grep({ $_.key ne 'vers' }).Hash);
+  my @mods = search-modules(%criteria.grep({ $_.key ne 'version' }).Hash);
   @mods = @mods.grep({
     my Version $v .=new( $_.version );
-    $v ~~ %criteria<vers> 
-  }) if %criteria<vers>; 
+    $v ~~ %criteria<version> 
+  }) if %criteria<version>; 
   content 'application/json', {
     meta_list => build-meta(@mods),
     results   => @mods.elems,
