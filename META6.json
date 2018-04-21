@@ -1,15 +1,36 @@
 {
-  "name"        : "Koos",
+  "name"        : "zefpan",
   "version"     : "0.0.1",
   "perl"        : "6",
   "description" : "zefpan",
   "auth"        : "github:tony-o",
   "authors"     : [ "Tony O'Dell" ],
-  "depends"     : {
-    "Koos": "*",
-    "Cro": "*",
-    "Crypt::Libcrypt": "*"
+  "depends"     : [
+    "Koos", "Cro", "Crypt::Libcrypt", "YAML::Parser::LibYAML"
+  ],
+  "provides"    : {
+		"Ctrl::.User.pm6.swp" :  "lib/Ctrl/.User.pm6.swp",
+		"Ctrl::.Package.pm6.swp" :  "lib/Ctrl/.Package.pm6.swp",
+		"Ctrl::Package" :  "lib/Ctrl/Package.pm6",
+		"Ctrl::User" :  "lib/Ctrl/User.pm6",
+		"Row::ModuleResources" :  "lib/Row/ModuleResources.pm6",
+		"Row::Token" :  "lib/Row/Token.pm6",
+		"Row::ModuleProvides" :  "lib/Row/ModuleProvides.pm6",
+		"Row::User" :  "lib/Row/User.pm6",
+		"Row::ModuleAuthors" :  "lib/Row/ModuleAuthors.pm6",
+		"Row::ModuleTags" :  "lib/Row/ModuleTags.pm6",
+		"Row::Module" :  "lib/Row/Module.pm6",
+		"Row::ModuleDepends" :  "lib/Row/ModuleDepends.pm6",
+		"Model::ModuleResources" :  "lib/Model/ModuleResources.pm6",
+		"Model::Token" :  "lib/Model/Token.pm6",
+		"Model::ModuleProvides" :  "lib/Model/ModuleProvides.pm6",
+		"Model::User" :  "lib/Model/User.pm6",
+		"Model::ModuleAuthors" :  "lib/Model/ModuleAuthors.pm6",
+		"Model::ModuleTags" :  "lib/Model/ModuleTags.pm6",
+		"Model::Module" :  "lib/Model/Module.pm6",
+		"Model::ModuleDepends" :  "lib/Model/ModuleDepends.pm6",
+		"Router" :  "lib/Router.pm6",
+		"Middleware" :  "lib/Middleware.pm6"
   },
-  "provides"    : {},
-  "source-url"  : "git://github.com/tony-o/perl6-koos.git"
+  "source-url"  : "git://github.com/tony-o/cro-koos.git"
 } 
