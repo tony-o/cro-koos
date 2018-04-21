@@ -31,4 +31,7 @@ sub hook-db is export {
   Cro::HTTP::Request.^add_method('model', sub ($request, $model) {
     return $koos.model($model);
   }) unless Cro::HTTP::Request.^can('model');
+  before {
+    server-log($_);
+  }
 }

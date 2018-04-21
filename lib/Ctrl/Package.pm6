@@ -13,6 +13,12 @@ our sub available('available', :$req = request) {
       if %params<version>;
   } if $req.method eq 'POST';
   my @mods = search-modules(%criteria.grep({ $_.key ne 'version' }).Hash);
+  @mods = @mods.unique(:with(-> $a, $b {
+       $a.name eqv $b.name
+    && $a.version eqv $b.version
+    && $a.auth eqv $b.auth
+    && $a.api eqv $b.api;
+  }));
   @mods = @mods.grep({
     my Version $v .=new( $_.version );
     $v ~~ %criteria<version> 
