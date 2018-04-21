@@ -5,7 +5,7 @@ our sub available('candidates', :$req = request) {
   CATCH { default { .say ; } }
   my %criteria;
   request-body -> %params {
-    %criteria<name> = %params<name> if %params<name>;
+    %criteria<name> = { like => '%'~%params<name>~'%' } if %params<name>;
     %criteria<auth> = %params<auth> if %params<auth>;
     # version/auth/api
     %criteria<api>     = Version.new(%params<api>)

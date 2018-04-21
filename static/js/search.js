@@ -48,4 +48,9 @@
   };
 
   input.blur(do_search);
+  input.keypress(function(e) {
+    if(e.keyCode==13){
+      do_search();
+    }
+  });
 })($);
