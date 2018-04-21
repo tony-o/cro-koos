@@ -71,7 +71,7 @@ multi sub process(%data) {
     version => $version,
     description => %data<description>,
     license => %data<license> ~~ Array ?? %data<license>.join(' and ') !! %data<license>,
-    source-url => %data<source-url>,
+    source-url => %data<source-url>//%data<support><source>//Any,
   });
   $module.update;
   if %data<authors>.defined && (%data<authors> ~~ Array || %data<auth>.defined) {

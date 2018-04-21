@@ -19,7 +19,11 @@
       row.find(".version").text(meta[i].version);
       row.find(".auth").text(meta[i].auth);
       row.find(".api").text(meta[i].api);
-      row.find(".source").html("<a target=\"_new\" href=\"" + meta[i]['source-url'].replace('git://', 'https://') + "\">"+meta[i]['source-url']+"</a>");
+      if(meta[i]['source-url']){
+        row.find(".source").html("<a target=\"_new\" href=\"" + meta[i]['source-url'].replace('git://', 'https://') + "\">"+meta[i]['source-url']+"</a>");
+      }else{
+        row.find(".source").html("");
+      }
       row.show();
       tbl.append(row);
     }
