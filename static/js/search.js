@@ -29,7 +29,7 @@
   var do_search  = function(){
     var query = { };
     var val   = input.val();
-    var split = val.match(/:ver<(.*?)>|:auth<(.*?)>|:api<(.*?)>/g);
+    var split = val.match(/:version<(.*?)>|:auth<(.*?)>|:api<(.*?)>/g);
     query.name = val;
     for(var i in split){
       query[split[i].substr(1, split[i].indexOf('<')-1)] = split[i].substr(split[i].indexOf('<')+1, split[i].length-2-split[i].indexOf('<'));
