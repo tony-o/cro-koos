@@ -50,14 +50,14 @@ multi sub process(IO $path where { $_ ~~ :f }) {
     version => $version,
     description => %data<description>,
     license => %data<license>,
-    source_url => %data<source_url>,
+    source-url => %data<source-url>,
   });
   $module.update;
   if %data<authors>.defined && (%data<authors> ~~ Array || %data<auth>.defined) {
     my @authors = %data<authors>.flat; 
     for @authors -> $author {
       $module.authors.new-row({
-        module_id => $module.module_id,
+        module-id => $module.module-id,
         name      => $author,
       }).update;
     }
@@ -69,20 +69,20 @@ multi sub process(IO $path where { $_ ~~ :f }) {
   
   for %(%data<provides>) -> $provide {
     $module.provides.new-row({
-      module_id => $module.module_id,
+      module-id => $module.module-id,
       name      => $provide.key,
       path      => $provide.value,
     }).update;
   }
   for @(%data<resources>).grep(*.defined) -> $r {
     $module.resources.new-row({
-      module_id => $module.module_id,
+      module-id => $module.module-id,
       name      => $r,
     }).update;
   }
   for @(%data<tags>).grep(*.defined) -> $r {
     $module.tags.new-row({
-      module_id => $module.module_id,
+      module-id => $module.module-id,
       tag       => $r,
     }).update;
   }
@@ -93,7 +93,7 @@ sub create-depends($module, @on, :$type = 'runtime') {
     $module.depends.new-row({
       name      => $dep,
       type      => 'test',
-      module_id => $module.module_id,
+      module-id => $module.module-id,
     }).update;
   }
 }

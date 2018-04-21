@@ -1,13 +1,13 @@
 use Koos::Model;
-unit class Model::ModuleDepends does Koos::Model['module_depends'];
+unit class Model::ModuleDepends does Koos::Model['module-depends'];
 
 has @.columns = [
-  module_depends_id => {
+  module-depends-id => {
     auto-increment => 1,
     is-primary-key => 1,
     type           => 'int',
   },
-  module_id => {
+  module-id => {
     type => 'int',
   },
   name => {
@@ -20,5 +20,5 @@ has @.columns = [
 ];
 
 has @.relations = [
-  module => { :has-one, :model<Module>, :relate(module_id => 'module_id'), },
+  module => { :has-one, :model<Module>, :relate(module-id => 'module-id'), },
 ];
