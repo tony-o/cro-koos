@@ -24,6 +24,10 @@ our sub available('available', :$req = request) {
     my Version $v .=new( $_.version );
     $v ~~ %criteria<version> 
   }) if %criteria<version>; 
+  @mods = @mods.grep({
+    my Version $v .=new( $_.api // '' );
+    $v ~~ %criteria<api>
+  }) if %criteria<api>;
   content 'application/json', {
     meta-list => build-meta(@mods),
     results   => @mods.elems,
