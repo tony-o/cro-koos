@@ -33,8 +33,11 @@ sub search-modules(%criteria) {
   my $mod = request.model('Module').search(%criteria);
   my $provides = request.model('ModuleProvides');
   my @mods = $mod.all;
-  @mods.push(|$provides.search({ name => %criteria<name> }).all.map({ .module }))
-    if %criteria<name>;
+  @mods.push(|$provides.search({ name => %criteria<name> }).all.grep({
+    ((%criteria<auth>.defined && %criteria<auth> eq .module.auth) || !%criteria<auth>.defined)
+    &&
+    ((%criteria<api>.defined && %criteria<api> eq .module.api) || !%criteria<api>.defined)
+  }).map({ .module })) if %criteria<name>;
   @mods;
 }
 
