@@ -6,7 +6,7 @@
   "auth"        : "github:tony-o",
   "authors"     : [ "Tony O'Dell" ],
   "depends"     : [
-    "Koos", "Cro", "Crypt::Libcrypt", "YAML::Parser::LibYAML"
+    "Koos", "Cro", "Crypt::Libcrypt", "YAML::Parser::LibYAML", "App::ecogen", "Text::Levenshtein::Damerau"
   ],
   "provides"    : {
 		"Ctrl::.User.pm6.swp" :  "lib/Ctrl/.User.pm6.swp",

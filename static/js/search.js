@@ -19,7 +19,11 @@
       row.find(".version").text(meta[i].version);
       row.find(".auth").text(meta[i].auth);
       row.find(".api").text(meta[i].api);
-      row.find(".source").html("<a target=\"_new\" href=\"" + meta[i]['source-url'].replace('git://', 'https://') + "\">"+meta[i]['source-url']+"</a>");
+      if(meta[i]['source-url']){
+        row.find(".source").html("<a target=\"_new\" href=\"" + meta[i]['source-url'].replace('git://', 'https://') + "\">"+meta[i]['source-url']+"</a>");
+      }else{
+        row.find(".source").html("");
+      }
       row.show();
       tbl.append(row);
     }
@@ -31,6 +35,7 @@
     var val   = input.val();
     var split = val.match(/:version<(.*?)>|:auth<(.*?)>|:api<(.*?)>/g);
     query.name = val;
+    query.sort = true;
     for(var i in split){
       query[split[i].substr(1, split[i].indexOf('<')-1)] = split[i].substr(split[i].indexOf('<')+1, split[i].length-2-split[i].indexOf('<'));
       query.name = query.name.replace(split[i], '');
@@ -48,4 +53,9 @@
   };
 
   input.blur(do_search);
+  input.keypress(function(e) {
+    if(e.keyCode==13){
+      do_search();
+    }
+  });
 })($);

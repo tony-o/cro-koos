@@ -2,13 +2,23 @@
 use lib 'lib';
 use Koos;
 use JSON::Fast;
+require App::ecogen;
 
 my $koos = Koos.new;
 $koos.connect(driver => 'SQLite', options => { db => { database => 'test.sqlite3', }, }, );
 
 my $mod-m = $koos.model('Module');
 
-sub MAIN(Any:D :$path) {
+multi sub MAIN('update', Bool :$skip-download = False) {
+  my $local-uri = $*CWD.child("ecosystems").absolute andthen *.IO.mkdir;
+  if !$skip-download {
+    my $proc = run('ecogen', '--/remote', '--local', qq|--local-uri=$local-uri|, 'update', 'p6c','cpan');
+    die "Failed to update ecosystem data" unless $proc.so;
+  }
+  process($local-uri);
+}
+
+multi sub MAIN(Any:D :$path) {
   die "{$path.IO.absolute} not found"
     unless $path.IO ~~ :e;
 
@@ -16,23 +26,34 @@ sub MAIN(Any:D :$path) {
 
 }
 
-multi sub process(IO $path where { $_ ~~ :d }) {
+multi sub process(IO() $path where { $_ ~~ :d }) {
   for $path.dir -> $x {
-    next if $x ~~ :f && $x.basename ne 'META6.json';
+    next if $x ~~ :f && $x.basename !~~ /'.json'$$/;
     process $x;
   }
 }
 
-multi sub process(IO $path where { $_ ~~ :f }) {
+multi sub process(IO() $path where { $_ ~~ :f }) {
   say "==> Processing {$path.relative}";
-  my %data = from-json $path.slurp;
+  my $data = from-json $path.slurp;
+  if $data ~~ Array {
+    for @($data).grep(*.defined) -> %obj {
+      process %obj;
+    }
+  } else {
+    process($data.Hash);
+  }
 
+}
+
+multi sub process(%data) {
   # check for existence
   my ($version, $api, $auth) = (
     %data<version>//%data<ver>,
     %data<api>//Any,
     %data<auth>.defined || (%data<author>.defined && %data<author> ~~ Str) ?? (%data<auth>//%data<author>) !! Any,
   );
+  $auth = $auth[0] if $auth ~~ Array;
   my $found = $mod-m.search({
     name    => %data<name>,
     version => $version,
@@ -42,15 +63,15 @@ multi sub process(IO $path where { $_ ~~ :f }) {
   return if $found;
 
 
-  "==> adding entry for {%data<name>}:ver<{$version}>:auth<{$auth}>:api<{$api//''}>".say;
+  "==> adding entry for {%data<name>}:ver<{$version}>:auth<{$auth//''}>:api<{$api//''}>".say;
   my $module = $mod-m.new-row({
     name => %data<name>,
     auth => $auth,
     ($api.defined ?? (api => $api) !! ()),
     version => $version,
     description => %data<description>,
-    license => %data<license>,
-    source-url => %data<source-url>,
+    license => %data<license> ~~ Array ?? %data<license>.join(' and ') !! %data<license>,
+    source-url => %data<source-url>//%data<support><source>//Any,
   });
   $module.update;
   if %data<authors>.defined && (%data<authors> ~~ Array || %data<auth>.defined) {
