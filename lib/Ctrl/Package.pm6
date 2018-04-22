@@ -1,9 +1,11 @@
 unit module Ctrl::Package;
+use Text::Levenshtein::Damerau;
 use Cro::HTTP::Router;
 
 our sub available('candidates', :$req = request) {
   CATCH { default { .say ; } }
   my %criteria;
+  my $rname;
   request-body -> %params {
     %criteria<name> = { like => '%'~%params<name>~'%' } if %params<name>;
     %criteria<auth> = %params<auth> if %params<auth>;
@@ -12,6 +14,7 @@ our sub available('candidates', :$req = request) {
       if %params<api>;
     %criteria<version> = Version.new(%params<version>)
       if %params<version>;
+    $rname = %params<name>;
   } if $req.method eq 'POST';
   my @mods = search-modules(%criteria.grep({ $_.key !~~ any('version', 'api') }).Hash);
   @mods = @mods.unique(:with(-> $a, $b {
@@ -29,7 +32,7 @@ our sub available('candidates', :$req = request) {
     $v ~~ %criteria<api>
   }) if %criteria<api>;
   content 'application/json', {
-    meta-list => build-meta(@mods),
+    meta-list => build-meta(@mods, $rname),
     results   => @mods.elems,
   };
 }
@@ -46,18 +49,26 @@ sub search-modules(%criteria) {
   @mods;
 }
 
-sub build-meta(@x) {
-  @x.map({ %(
-    provides => %(
-      $_.provides.all.map({$_.name => $_.path})
-    ),
-    depends => [$_.depends.search({ type => 'runtime' }).all.map(*.as-hash)],
-    build-depends => [$_.depends.search({ type => 'build' }).all.map(*.as-hash)],
-    test-depends => [$_.depends.search({ type => 'test' }).all.map(*.as-hash)],
-    resources => [$_.resources.all.map(*.as-hash<name>)],
-    tags => [$_.tags.all.map(*.as-hash<tag>)],
-    authors => [$_.authors.all.map(*.as-hash<name>)],
-    $_.as-hash.grep({ $_.key ne 'module-id' }).Slip,
-  ) });
+sub build-meta(@x, $name) {
+  @x.map({ 
+    my $dld-match = $_.name.lc.index($name.lc) ?? $_.name !! $_.provides.all.map({.name}).grep(*.lc.match($name.lc)).first;
+    %(
+      provides => %(
+        $_.provides.all.map({$_.name => $_.path})
+      ),
+      depends => [$_.depends.search({ type => 'runtime' }).all.map(*.as-hash)],
+      build-depends => [$_.depends.search({ type => 'build' }).all.map(*.as-hash)],
+      test-depends => [$_.depends.search({ type => 'test' }).all.map(*.as-hash)],
+      resources => [$_.resources.all.map(*.as-hash<name>)],
+      tags => [$_.tags.all.map(*.as-hash<tag>)],
+      authors => [$_.authors.all.map(*.as-hash<name>)],
+      $_.as-hash.grep({ $_.key ne 'module-id' }).Slip,
+      __internal__ => {
+        match-score => $dld-match ?? dld($name.lc, $dld-match.lc) / $name.chars !! 0,
+      },
+    )
+  }).sort({
+    $^a<__internal__><match-score> cmp $^b<__internal__><match-score> 
+  });
 }
 
