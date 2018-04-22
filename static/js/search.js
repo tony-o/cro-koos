@@ -35,6 +35,7 @@
     var val   = input.val();
     var split = val.match(/:version<(.*?)>|:auth<(.*?)>|:api<(.*?)>/g);
     query.name = val;
+    query.sort = true;
     for(var i in split){
       query[split[i].substr(1, split[i].indexOf('<')-1)] = split[i].substr(split[i].indexOf('<')+1, split[i].length-2-split[i].indexOf('<'));
       query.name = query.name.replace(split[i], '');

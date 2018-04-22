@@ -5,7 +5,7 @@ use Cro::HTTP::Router;
 our sub available('candidates', :$req = request) {
   CATCH { default { .say ; } }
   my %criteria;
-  my $rname;
+  my $rname = '';
   request-body -> %params {
     %criteria<name> = { like => '%'~%params<name>~'%' } if %params<name>;
     %criteria<auth> = %params<auth> if %params<auth>;
@@ -14,7 +14,7 @@ our sub available('candidates', :$req = request) {
       if %params<api>;
     %criteria<version> = Version.new(%params<version>)
       if %params<version>;
-    $rname = %params<name>;
+    $rname = %params<name> if %params<sort>;
   } if $req.method eq 'POST';
   my @mods = search-modules(%criteria.grep({ $_.key !~~ any('version', 'api') }).Hash);
   @mods = @mods.unique(:with(-> $a, $b {
@@ -49,8 +49,8 @@ sub search-modules(%criteria) {
   @mods;
 }
 
-sub build-meta(@x, $name) {
-  @x.map({ 
+sub build-meta(@x, $name = '') {
+  my @r = @x.map({ 
     my $dld-match = $_.name.lc.index($name.lc) ?? $_.name !! $_.provides.all.map({.name}).grep(*.lc.match($name.lc)).first;
     %(
       provides => %(
@@ -64,11 +64,13 @@ sub build-meta(@x, $name) {
       authors => [$_.authors.all.map(*.as-hash<name>)],
       $_.as-hash.grep({ $_.key ne 'module-id' }).Slip,
       __internal__ => {
-        match-score => $dld-match ?? dld($name.lc, $dld-match.lc) / $name.chars !! 0,
+        match-score => $name ne '' && $dld-match ?? dld($name.lc, $dld-match.lc) / $name.chars !! 0,
       },
     )
-  }).sort({
-    $^a<__internal__><match-score> cmp $^b<__internal__><match-score> 
   });
+  @r.=sort({
+    $^a<__internal__><match-score> cmp $^b<__internal__><match-score> 
+  }) if $name ne '';
+  @r;
 }
 
