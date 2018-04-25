@@ -86,7 +86,7 @@ multi sub process(%data) {
 
   create-depends $module, @(%data<test-depends>).grep(*.defined), :type<test>;
   create-depends $module, @(%data<build-depends>).grep(*.defined), :type<build>;
-  create-depends $module, @(%data<depends>).grep(*.defined);
+  create-depends $module, @(%data<depends>).grep(*.defined), :type<runtime>;
   
   for %(%data<provides>) -> $provide {
     $module.provides.new-row({
@@ -113,7 +113,7 @@ sub create-depends($module, @on, :$type = 'runtime') {
   for @on -> $dep {
     $module.depends.new-row({
       name      => $dep,
-      type      => 'test',
+      type      => $type,
       module-id => $module.module-id,
     }).update;
   }
