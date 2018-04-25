@@ -2,9 +2,10 @@ post:
   - Ctrl::User::&create
   - Ctrl::User::&request-token
   - Ctrl::User::&remove-tokens
-  - Ctrl::Package::&available
+  - Ctrl::Package::&candidates
+  - Ctrl::Package::&dependencies
 get:
-  - Ctrl::Package::&available
+  - Ctrl::Package::&candidates
 get:
   - Ctrl::UI::&main
   - Ctrl::UI::&try-static

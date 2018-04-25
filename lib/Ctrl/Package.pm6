@@ -2,7 +2,7 @@ unit module Ctrl::Package;
 use Text::Levenshtein::Damerau;
 use Cro::HTTP::Router;
 
-our sub available('candidates', :$req = request) {
+our sub candidates('candidates', :$req = request) {
   CATCH { default { .say ; } }
   my %criteria;
   my $rname = '';
@@ -32,9 +32,56 @@ our sub available('candidates', :$req = request) {
     $v ~~ %criteria<api>
   }) if %criteria<api>;
   content 'application/json', {
-    meta-list => build-meta(@mods, $rname),
+    meta-list => clean-meta(build-meta(@mods, $rname)),
     results   => @mods.elems,
   };
+}
+
+our sub dependencies('dependencies', :$req = request) {
+  request-body -> %params {
+    my %criteria;
+    %criteria<name>    = %params<name>;
+    %criteria<auth>    = %params<auth>    if %params<auth>;
+    %criteria<api>     = %params<api>     if %params<api>;
+    %criteria<version> = %params<version> if %params<version>;
+    my $mod = $req.model('Module').search(%criteria).first;
+    return content 'application/json', {
+      success => 0,
+      message => 'Module not found',
+    } unless $mod;
+    my @tier = build-tiers($mod);
+    @tier = clean-meta @tier;
+    content 'application/json', {
+      success     => 1,
+      build-tiers => @tier,
+    };
+  }
+}
+
+sub build-tiers($mod, :$depth = 10) {
+  return if $depth <= 0;
+  my @deps;
+  my @get-deps = $mod;
+  my @swap-deps;
+  my %got-deps = :nap, :Test,;
+  my $m-rs = $mod.dbo.model('Module');
+  my @errors;
+  repeat { # my brain isn't working, this is a hack.
+    @swap-deps = ();
+    for @get-deps -> $dep {
+      next if %got-deps{$dep.name};
+      @deps.push($dep);
+      %got-deps{$dep.name} = True;
+      for @($dep.depends.all).grep(*.defined && *.^can('name')) -> $x {
+        my $mod2 = $m-rs.search(%( name => $x.name, )).first;
+        @errors.push($x.name), next unless $mod2;
+        @swap-deps.push($mod2) unless %got-deps{$mod2.name};
+      }
+    }
+    @get-deps = @swap-deps;
+  } while @get-deps.elems;
+  @deps = build-meta( @deps, $mod.name );
+  @deps;
 }
 
 sub search-modules(%criteria) {
@@ -74,3 +121,14 @@ sub build-meta(@x, $name = '') {
   @r;
 }
 
+sub clean-meta(@x) {
+  for @x -> $meta is rw {
+    $meta<__internal__>:delete;
+    for [qw<depends build-depends test-depends>] -> $dep {
+      $meta{$dep} = $meta{$dep}.map({
+        $_<name>
+      });
+    }
+  }
+  @x;
+}
